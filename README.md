@@ -12,8 +12,3 @@ Input string can be any combination of dice including static rolls.
 * d20
 * d20 d20 d20
 * d3 2d5 d10 + 6
-
-## Known issues
-
-* 1
-* 1 + 1
