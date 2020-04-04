@@ -74,10 +74,10 @@ const rollAndShow = () => {
       })
     )
     .child('p', _=>_
-      .text(result.values.join(' + ') + ' = ')
-      .child('span', _=>_
-        .text(result.sum)
-      )
+      .text(result.values.join(' + '))
+    )
+    .child('p', _=>_
+      .text(' = ' + result.sum)
     )
   );
 }
