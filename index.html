@@ -1,0 +1,84 @@
+<div id="root"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/brynja/cdn/brynja.js"></script>
+<script>
+// Dice string parser & roller.
+Math.random.between = (min, max) => Math.floor(Math.random()*(max-min+1)+min);
+
+const parseString = (inputString) => {
+	const regex = /(?<count>\d*?)d(?<sides>\d+?)(?:\s*\+\s*(?<fixed>\d+?))?/gi;
+  const matches = [...inputString.matchAll(regex)];
+  
+  const dice = matches.map(match => {
+  	const { count, sides, fixed } = match.groups;
+    return ({
+      raw: match[0],
+      fixed: parseFloat(fixed || '0'),
+      dieCount: parseFloat(count || '1'),
+      dieSides: parseFloat(sides),
+    });
+  });
+  
+  return dice;
+};
+
+const rollDice = (dice) => dice
+	.map(die => ({
+  	...die,
+    rolls: Array(die.dieCount)
+    	.fill(0)
+      .map(() => Math.random.between(1, die.dieSides)),
+  }));
+  
+const calculateResult = (rolls) => rolls
+	.map(r => r.fixed + r.rolls.reduce((s, v) => s + v, 0))
+  .reduce((s, v) => s + v, 0);
+
+const roll = (inputString) => {
+  const dice = parseString(inputString);
+  const rolls = rollDice(dice);
+  const result = calculateResult(rolls);
+	
+  return ({
+  	sum: result,
+    values: rolls.flatMap(r => {
+      if (r.fixed) {
+        return [...r.rolls, r.fixed];
+      }
+      return r.rolls;
+    }),
+    dice: rolls,
+  });
+}
+
+
+const placeholder = '2d4 + 2 + d6';
+let input = placeholder;
+
+const rollAndShow = () => {
+	const result = roll(input);
+	brynja.render(_=>_
+    .child('input', _=>_
+      .prop('placeholder', placeholder)
+      .on('change', (ev) => {
+      	input = ev.target.value;
+        rollAndShow();
+      })
+    )
+    .child('button', _=>_
+    	.text('Roll')
+      .on('click', () => {
+        rollAndShow();
+      })
+    )
+    .child('p', _=>_
+      .text(result.values.join(' + ') + ' = ')
+      .child('span', _=>_
+        .text(result.sum)
+      )
+    )
+  );
+}
+
+rollAndShow();
+</script>
