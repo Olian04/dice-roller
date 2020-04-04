@@ -8,7 +8,7 @@
 Math.random.between = (min, max) => Math.floor(Math.random()*(max-min+1)+min);
 
 const parseString = (inputString) => {
-	const regex = /(\d*?)d(\d+?)(?:\s*\+\s*(\d+?))?/gi;
+	const regex = /(\d*)d(\d+)(?:\s*\+\s*(\d+))?(?:\s|\+)/gi;
   const matches = [...inputString.matchAll(regex)];
   
   const dice = matches.map(match => {
@@ -58,12 +58,12 @@ const placeholder = '2d4 + 2 + d6';
 let input = placeholder;
 
 const rollAndShow = () => {
-	const result = roll(input);
-	brynja.render(_=>_
+   const result = roll(input);
+   brynja.render(_=>_
     .child('input', _=>_
       .prop('placeholder', placeholder)
       .on('change', (ev) => {
-      	input = ev.target.value;
+      	input = ev.target.value || placeholder;
         rollAndShow();
       })
     )
