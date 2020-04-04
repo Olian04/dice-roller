@@ -12,9 +12,9 @@ const parseString = (inputString) => {
   const matches = [...inputString.matchAll(regex)];
   
   const dice = matches.map(match => {
-  	const { count, sides, fixed } = match.groups;
+  	const [ fullMatch, count, sides, fixed ] = match;
     return ({
-      raw: match[0],
+      raw: fullMatch,
       fixed: parseFloat(fixed || '0'),
       dieCount: parseFloat(count || '1'),
       dieSides: parseFloat(sides),
