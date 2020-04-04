@@ -5,13 +5,13 @@
 <script src="https://cdn.jsdelivr.net/npm/brynja/cdn/brynja.js"></script>
 <script>
 const rollSingleDie = (max) => Math.floor(Math.random()*max + 1);
-const regex = /(\d*)d(\d+)(?:\s*\+\s*(\d+))?(?:\s|\+|$)/gi;
+const regex = /(?:(\d+)?d(\d+)(?:\s*\+\s*(\d+))?|(\d+))(?:\s|\+|$)/gi;
   
 const parseString = (inputString) => [...inputString.matchAll(regex)]
-  .map(([__, count, sides, fixed]) => ({
-    fixed: parseFloat(fixed || '0'),
-    dieCount: parseFloat(count || '1'),
-    dieSides: parseFloat(sides),
+  .map(([__, count, sides, fixed, fixedAlone]) => ({
+    fixed: parseFloat(fixed || fixedAlone || '0'),
+    dieCount: parseFloat(count || (!!sides ? '1' : '0')),
+    dieSides: parseFloat(sides || '0'),
   }));
 
 const rollDice = (dice) => dice
