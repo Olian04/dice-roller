@@ -4,36 +4,27 @@
 
 <script src="https://cdn.jsdelivr.net/npm/brynja/cdn/brynja.js"></script>
 <script>
-// Dice string parser & roller.
-Math.random.between = (min, max) => Math.floor(Math.random()*(max-min+1)+min);
-
-const parseString = (inputString) => {
-	const regex = /(\d*)d(\d+)(?:\s*\+\s*(\d+))?(?:\s|\+|$)/gi;
-  const matches = [...inputString.matchAll(regex)];
+const rollSingleDie = (max) => Math.floor(Math.random()*max + 1);
+const regex = /(\d*)d(\d+)(?:\s*\+\s*(\d+))?(?:\s|\+|$)/gi;
   
-  const dice = matches.map(match => {
-  	const [ fullMatch, count, sides, fixed ] = match;
-    return ({
-      raw: fullMatch,
-      fixed: parseFloat(fixed || '0'),
-      dieCount: parseFloat(count || '1'),
-      dieSides: parseFloat(sides),
-    });
-  });
-  
-  return dice;
-};
+const parseString = (inputString) => [...inputString.matchAll(regex)]
+  .map(([__, count, sides, fixed]) => ({
+    fixed: parseFloat(fixed || '0'),
+    dieCount: parseFloat(count || '1'),
+    dieSides: parseFloat(sides),
+  }));
 
 const rollDice = (dice) => dice
-	.map(die => ({
-  	...die,
+  .map(die => ({
+    fixed: die.fixed,
+    die: `d${die.dieSides}`,
     rolls: Array(die.dieCount)
-    	.fill(0)
-      .map(() => Math.random.between(1, die.dieSides)),
+      .fill(0)
+      .map(() => rollSingleDie(die.dieSides)),
   }));
   
 const calculateResult = (rolls) => rolls
-	.map(r => r.fixed + r.rolls.reduce((s, v) => s + v, 0))
+  .map(r => r.fixed + r.rolls.reduce((s, v) => s + v, 0))
   .reduce((s, v) => s + v, 0);
 
 const roll = (inputString) => {
@@ -42,7 +33,7 @@ const roll = (inputString) => {
   const result = calculateResult(rolls);
 	
   return ({
-  	sum: result,
+    sum: result,
     values: rolls.flatMap(r => {
       if (r.fixed) {
         return [...r.rolls, r.fixed];
@@ -59,6 +50,7 @@ let input = placeholder;
 
 const rollAndShow = () => {
    const result = roll(input);
+   console.log(result);
    brynja.render(_=>_
     .child('input', _=>_
       .prop('placeholder', placeholder)
@@ -68,7 +60,7 @@ const rollAndShow = () => {
       })
     )
     .child('button', _=>_
-    	.text('Roll')
+      .text('Roll')
       .on('click', () => {
         rollAndShow();
       })
