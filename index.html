@@ -1,78 +1,49 @@
-<center>
-	<div id="root"></div>
-</center>
-
-<script src="https://cdn.jsdelivr.net/npm/brynja/cdn/brynja.js"></script>
-<script>
-const rollSingleDie = (max) => Math.floor(Math.random()*max + 1);
-const regex = /(?:(\d+)?d(\d+)(?:\s*\+\s*(\d+))?|(\d+))(?:\s|\+|$)/gi;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <center>
+    <div id="root"></div>
+  </center>
   
-const parseString = (inputString) => [...inputString.matchAll(regex)]
-  .map(([__, count, sides, fixed, fixedAlone]) => ({
-    fixed: parseFloat(fixed || fixedAlone || '0'),
-    dieCount: parseFloat(count || (!!sides ? '1' : '0')),
-    dieSides: parseFloat(sides || '0'),
-  }));
-
-const rollDice = (dice) => dice
-  .map(die => ({
-    fixed: die.fixed,
-    die: `d${die.dieSides}`,
-    rolls: Array(die.dieCount)
-      .fill(0)
-      .map(() => rollSingleDie(die.dieSides)),
-  }));
+  <script src="https://cdn.jsdelivr.net/npm/brynja/cdn/brynja.js"></script>
+  <script src="./src/index.js"></script>
+  <script>
+    const placeholder = '2d4 + 2 + d6';
+    let input = placeholder;
   
-const calculateResult = (rolls) => rolls
-  .map(r => r.fixed + r.rolls.reduce((s, v) => s + v, 0))
-  .reduce((s, v) => s + v, 0);
+    const rollAndShow = () => {
+      const result = rollDice(input);
+      console.log(result);
+      brynja.render(_=>_
+        .child('input', _=>_
+          .prop('placeholder', placeholder)
+          .on('change', (ev) => {
+            input = ev.target.value || placeholder;
+            rollAndShow();
+          })
+        )
+        .child('button', _=>_
+          .text('Roll')
+          .on('click', () => {
+            rollAndShow();
+          })
+        )
+        .child('p', _=>_
+          .text(result.values.join(' + '))
+        )
+        .child('p', _=>_
+          .text(' = ' + result.sum)
+        )
+      );
+    }
+  
+    rollAndShow();
+  </script>
+</body>
+</html>
 
-const roll = (inputString) => {
-  const dice = parseString(inputString);
-  const rolls = rollDice(dice);
-  const result = calculateResult(rolls);
-	
-  return ({
-    sum: result,
-    values: rolls.flatMap(r => {
-      if (r.fixed) {
-        return [...r.rolls, r.fixed];
-      }
-      return r.rolls;
-    }),
-    dice: rolls,
-  });
-}
-
-
-const placeholder = '2d4 + 2 + d6';
-let input = placeholder;
-
-const rollAndShow = () => {
-   const result = roll(input);
-   console.log(result);
-   brynja.render(_=>_
-    .child('input', _=>_
-      .prop('placeholder', placeholder)
-      .on('change', (ev) => {
-      	input = ev.target.value || placeholder;
-        rollAndShow();
-      })
-    )
-    .child('button', _=>_
-      .text('Roll')
-      .on('click', () => {
-        rollAndShow();
-      })
-    )
-    .child('p', _=>_
-      .text(result.values.join(' + '))
-    )
-    .child('p', _=>_
-      .text(' = ' + result.sum)
-    )
-  );
-}
-
-rollAndShow();
-</script>

@@ -1,0 +1,22 @@
+{
+  "name": "@olian/dice-roller",
+  "version": "1.1.1",
+  "description": "Tiny Dice Rolling POC",
+  "main": "src/index.js",
+  "bin" : { 
+    "roll" : "./run.js" 
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Olian04/dice-roller.git"
+  },
+  "author": "Olian04",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Olian04/dice-roller/issues"
+  },
+  "homepage": "https://github.com/Olian04/dice-roller#readme"
+}
