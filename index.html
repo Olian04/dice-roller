@@ -10,9 +10,12 @@
   <div id="terminal"></div>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/addons/fit/fit.min.js"></script>
   <script src="https://unpkg.com/@olian/dice-roller@1.1.2/src/index.js"></script>
   <script>
 const term = new Terminal();
+const fitAddon = new FitAddon();
+term.loadAddon(fitAddon);
 term.open(document.getElementById('terminal'));
 
 let input = '';
