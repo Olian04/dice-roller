@@ -14,10 +14,11 @@
   <script src="https://unpkg.com/@olian/dice-roller@1.1.2/src/index.js"></script>
   <script>
 const term = new Terminal();
-const fitAddon = new FitAddon();
+const fitAddon = new new FitAddon.FitAddon();
 term.loadAddon(fitAddon);
 term.open(document.getElementById('terminal'));
-
+fitAddon.fit();
+	  
 let input = '';
 
 const runCommand = () => {
