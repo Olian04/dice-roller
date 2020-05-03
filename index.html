@@ -3,46 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/@olian/dice-roller@1.1.2/src/index.js"> 
   <title>Document</title>
 </head>
 <body>
-  <center>
-    <div id="root"></div>
-  </center>
+  <div id="terminal"></div>
   
-  <script src="https://cdn.jsdelivr.net/npm/brynja/cdn/brynja.js"></script>
-  <script src="./src/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xterm/3.14.5/xterm.min.js"></script>
+  <script src="https://unpkg.com/@olian/dice-roller@1.1.2/src/index.js"></script>
   <script>
-    const placeholder = '2d4 + 2 + d6';
-    let input = placeholder;
-  
-    const rollAndShow = () => {
-      const result = rollDice(input);
-      console.log(result);
-      brynja.render(_=>_
-        .child('input', _=>_
-          .prop('placeholder', placeholder)
-          .on('change', (ev) => {
-            input = ev.target.value || placeholder;
-            rollAndShow();
-          })
-        )
-        .child('button', _=>_
-          .text('Roll')
-          .on('click', () => {
-            rollAndShow();
-          })
-        )
-        .child('p', _=>_
-          .text(result.values.join(' + '))
-        )
-        .child('p', _=>_
-          .text(' = ' + result.sum)
-        )
-      );
+const term = new Terminal();
+term.open(document.getElementById('terminal'));
+
+let input = '';
+
+const runCommand = () => {
+	const [command, ...args] = input.trim().split(' ');
+  if (command !== 'roll') {
+  	term.write('\r\nUnknown command: ' + command);
+  	return;
+  }
+  const diceString = args.length === 0 ? 'd20' : args.join(' ');
+	term.write('\r\n' + diceString);
+  const result = rollDice(diceString);
+	term.write('\r\n' + result.values.join(' + ') + ' = ' + result.sum);
+}
+
+function run() {
+  if (term._initialized) {
+    return;
+  }
+
+  term._initialized = true;
+
+  term.prompt = () => {
+    term.write('\r\n$ ');
+  };
+
+  term.writeln('Try typing "roll"!');
+  prompt(term);
+
+  term.onKey(e => {
+    const printable = !e.domEvent.altKey && !e.domEvent.altGraphKey && !e.domEvent.ctrlKey && !e.domEvent.metaKey;
+
+    if (e.domEvent.keyCode === 13) {
+    	runCommand();
+      input = '';
+      prompt(term);
+    } else if (e.domEvent.keyCode === 8) {
+      // Do not delete the prompt
+      if (term._core.buffer.x > 2) {
+        term.write('\b \b');
+        input = input.slice(0, input.length-1);
+      }
+    } else if (printable) {
+    	input += e.key;
+      term.write(e.key);
     }
-  
-    rollAndShow();
+  });
+}
+
+function prompt(term) {
+  term.write('\r\n$ ');
+}
+run();
   </script>
 </body>
 </html>
